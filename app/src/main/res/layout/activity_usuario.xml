@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button_atras_usuario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Atrás"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="USUARIO 1"/>
+
+            <ImageView
+                android:id="@+id/image_profile_usuario"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_gravity="right"
+                android:src="@drawable/profile_photo"/>
+
+        </android.support.v7.widget.Toolbar>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha límite:"/>
+        <EditText
+            android:id="@+id/edit_text_fecha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tarea:"/>
+        <EditText
+            android:id="@+id/edit_text_tarea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Documentos:"/>
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_margin="@dimen/activity_horizontal_margin"></ListView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comentarios:"/>
+        <ListView
+            android:id="@+id/list_comentarios"
+            android:layout_width="match_parent"
+            android:layout_height="225dp"
+            android:layout_gravity="bottom"
+            android:layout_margin="@dimen/activity_horizontal_margin">
+        </ListView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="Comentar:"/>
+        <EditText
+            android:id="@+id/edit_text_comentar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"/>
+    </LinearLayout>
+</LinearLayout>
