@@ -7,18 +7,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FragmentPerfil.OnFragmentInteractionListener} interface
+ * {@link ComunicaProyectoConActivity} interface
  * to handle interaction events.
- * Use the {@link FragmentPerfil#newInstance} factory method to
+ * Use the {@link ProyectoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentPerfil extends Fragment {
+public class ProyectoFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,9 +27,9 @@ public class FragmentPerfil extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private ComunicaPerfilconActivity mListener;
-    private Button bGuardar;
-    public FragmentPerfil() {
+    private ComunicaProyectoConActivity mListener;
+
+    public ProyectoFragment() {
         // Required empty public constructor
     }
 
@@ -40,11 +39,11 @@ public class FragmentPerfil extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentPerfil.
+     * @return A new instance of fragment ProyectoFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static FragmentPerfil newInstance(String param1, String param2) {
-        FragmentPerfil fragment = new FragmentPerfil();
+    public static ProyectoFragment newInstance(String param1, String param2) {
+        ProyectoFragment fragment = new ProyectoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -64,32 +63,27 @@ public class FragmentPerfil extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v;
         // Inflate the layout for this fragment
-        v=inflater.inflate(R.layout.fragment_fragment_perfil, container, false);
-        bGuardar = v.findViewById(R.id.button_guardar);
-        bGuardar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.datosGuardados();
-            }
-        });
-
-        return v;
+        return inflater.inflate(R.layout.fragment_proyecto, container, false);
     }
 
-
- //   @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof ComunicaPerfilconActivity) {
-            mListener = (ComunicaPerfilconActivity) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " tienes que implementar la interfaz ComunicaPerfilconActivity");
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
         }
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof ComunicaProyectoConActivity) {
+            mListener = (ComunicaProyectoConActivity) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement ComunicaProyectoConActivity");
+        }
+    }
 
     @Override
     public void onDetach() {
@@ -107,9 +101,8 @@ public class FragmentPerfil extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface ComunicaPerfilconActivity {
+    public interface ComunicaProyectoConActivity {
         // TODO: Update argument type and name
-        void datosGuardados();
+        void onFragmentInteraction(Uri uri);
     }
-
 }

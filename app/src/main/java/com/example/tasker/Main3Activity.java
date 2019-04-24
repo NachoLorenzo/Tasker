@@ -1,5 +1,6 @@
 package com.example.tasker;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,11 +20,13 @@ import android.widget.FrameLayout;
 
 public class Main3Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        FragmentPerfil.ComunicaPerfilconActivity {
+        PerfilFragment.ComunicaPerfilconActivity,
+        UsuarioFragment.ComunicaUsuarioConActivity,
+        ProyectoFragment.ComunicaProyectoConActivity {
 
-        Fragment fperfil;
-        FragmentManager fm;
-        FragmentTransaction ft;
+        Fragment fperfil, fusuario, fproyecto;
+        FragmentManager fm, fm2, fm3;
+        FragmentTransaction ft, ft2, ft3;
 
       //  FrameLayout fl;
 
@@ -54,14 +57,6 @@ public class Main3Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-
-        //Creamos el fragment Perfil
-        fperfil=new FragmentPerfil().newInstance("","");
-        fm=getSupportFragmentManager();
-        ft=fm.beginTransaction();
-        ft.replace(R.id.fr_contenido_ppal,fperfil);
-        ft.commit();
     }
 
     @Override
@@ -96,18 +91,34 @@ public class Main3Activity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_perfil) {
+            //Creamos el fragment Perfil
+            fperfil = new PerfilFragment().newInstance("","");
+            fm = getSupportFragmentManager();
+            ft = fm.beginTransaction();
+            ft.replace(R.id.fr_contenido_ppal, fperfil);
+            ft.commit();
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_proyectos) {
+            //Creamos el fragment Proyecto
+            fproyecto = new ProyectoFragment().newInstance("","");
+            fm3 = getSupportFragmentManager();
+            ft3 = fm3.beginTransaction();
+            ft3.replace(R.id.fr_contenido_ppal, fproyecto);
+            ft3.commit();
 
+        } else if (id == R.id.nav_usuario) {
+            //Creamos el fragment Usuario
+            fusuario = new UsuarioFragment().newInstance("","");
+            fm2 = getSupportFragmentManager();
+            ft2 = fm2.beginTransaction();
+            ft2.replace(R.id.fr_contenido_ppal, fusuario);
+            ft2.commit();
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
@@ -122,9 +133,14 @@ public class Main3Activity extends AppCompatActivity
     }
 
     @Override
-    public void datosGuardados() {
+    public void datosGuardados() {//HACER QUE ENVÍE DATOS A LA BD
         ft=fm.beginTransaction();
         ft.remove(fperfil);
         ft.commit();
+    }
+    //Interfaz UsuarioFragment
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
