@@ -76,10 +76,14 @@ public class UsuarioFragment extends Fragment {
         b_enviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String comentario = edit_comentario.getText().toString();
-                list_items.add(comentario);
-                list_adapter.notifyDataSetChanged();
-                edit_comentario.setText("");
+                if (edit_comentario.getText().toString().matches("")) {
+                    Toast.makeText(getContext(), "Escribe algo", Toast.LENGTH_SHORT).show();
+                } else {
+                    String comentario = edit_comentario.getText().toString();
+                    list_items.add(comentario);
+                    list_adapter.notifyDataSetChanged();
+                    edit_comentario.setText("");
+                }
             }
         });
         lista_comentarios.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -105,8 +109,8 @@ public class UsuarioFragment extends Fragment {
         AdapterView.AdapterContextMenuInfo adapterContextMenu = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()){
             case R.id.action_delete:
-                list_items.remove(list_adapter.getItem(adapterContextMenu.position));
-                list_adapter.notifyDataSetChanged();
+                    list_items.remove(list_adapter.getItem(adapterContextMenu.position));
+                    list_adapter.notifyDataSetChanged();
             default:
                 return super.onOptionsItemSelected(item);
         }

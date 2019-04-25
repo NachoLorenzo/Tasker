@@ -18,6 +18,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class Main3Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         PerfilFragment.ComunicaPerfilconActivity,
@@ -27,6 +30,10 @@ public class Main3Activity extends AppCompatActivity
         Fragment fperfil, fusuario, fproyecto;
         FragmentManager fm, fm2, fm3;
         FragmentTransaction ft, ft2, ft3;
+
+        FirebaseDatabase DB = FirebaseDatabase.getInstance();
+        DatabaseReference DBRef = DB.getReference("mensaje");
+
 
       //  FrameLayout fl;
 
@@ -39,15 +46,6 @@ public class Main3Activity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
