@@ -46,7 +46,7 @@ public class PerfilFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v;
         // Inflate the layout for this fragment
-        v=inflater.inflate(R.layout.fragment_fragment_perfil, container, false);
+        v=inflater.inflate(R.layout.fragment_perfil, container, false);
 
         edit_profile_name = v.findViewById(R.id.edit_text_nombre_usuario);
         edit_edad = v.findViewById(R.id.edit_text_edad);

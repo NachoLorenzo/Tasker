@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class UsuarioFragment extends Fragment {
     private ComunicaUsuarioConActivity mListener;
     private ImageView b_enviar;
     private EditText edit_fecha, edit_tarea, edit_comentario;
+    private Spinner spinnerUsuario;
     private ListView lista_comentarios;
 
     private ArrayList<String> list_items;
@@ -72,7 +74,10 @@ public class UsuarioFragment extends Fragment {
         list_items = new ArrayList<String>();
         list_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, list_items);
         lista_comentarios.setAdapter(list_adapter);
+        spinnerUsuario = (Spinner) v.findViewById(R.id.spinnerUsuario);
 
+
+        //LISTENER BOTÓN ENVIAR
         b_enviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

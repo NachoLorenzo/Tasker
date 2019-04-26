@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -31,11 +32,10 @@ public class Main3Activity extends AppCompatActivity
         FragmentManager fm, fm2, fm3;
         FragmentTransaction ft, ft2, ft3;
 
-        FirebaseDatabase DB = FirebaseDatabase.getInstance();
-        DatabaseReference DBRef = DB.getReference("mensaje");
+        //private DatabaseReference reference;
 
 
-      //  FrameLayout fl;
+    //  FrameLayout fl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +55,8 @@ public class Main3Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //reference = FirebaseDatabase.getInstance().getReference("reference");
     }
 
     @Override
@@ -104,7 +106,7 @@ public class Main3Activity extends AppCompatActivity
 
         } else if (id == R.id.nav_proyectos) {
             //Creamos el fragment Proyecto
-            fproyecto = new ProyectoFragment().newInstance("","");
+            fproyecto = new ProyectoFragment().newInstance();
             fm3 = getSupportFragmentManager();
             ft3 = fm3.beginTransaction();
             ft3.replace(R.id.fr_contenido_ppal, fproyecto);
