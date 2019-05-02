@@ -3,11 +3,15 @@ package com.example.tasker;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 /**
@@ -24,6 +28,7 @@ public class PerfilFragment extends Fragment {
     private ComunicaPerfilconActivity mListener;
     private Button bGuardar, bEditar;
     private EditText edit_profile_name, edit_edad, edit_email;
+    private DatabaseReference referencePerfil;
     public PerfilFragment() {
         // Required empty public constructor
     }
@@ -57,13 +62,16 @@ public class PerfilFragment extends Fragment {
         edit_email.setEnabled(false);
 
         bGuardar = v.findViewById(R.id.button_guardar);
+
+        referencePerfil = FirebaseDatabase.getInstance().getReference();
+
         bGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 edit_profile_name.setEnabled(false);
                 edit_edad.setEnabled(false);
                 edit_email.setEnabled(false);
-                mListener.datosGuardados();
+                guardarPerfil();
             }
         });
         bEditar = v.findViewById(R.id.button_edit);
@@ -97,6 +105,16 @@ public class PerfilFragment extends Fragment {
         mListener = null;
     }
 
+    public void guardarPerfil(){
+        String nombre = edit_profile_name.getText().toString();
+        String edad = edit_edad.getText().toString();
+        String email = edit_email.getText().toString();
+        String id = referencePerfil.push().getKey();
+
+        Usuario perfil = new Usuario(id, nombre, edad, email);
+        referencePerfil.child("Usuario").child(id).setValue(perfil);
+
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
