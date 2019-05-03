@@ -2,8 +2,10 @@ package com.example.tasker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -29,6 +32,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -54,13 +59,16 @@ public class UsuarioFragment extends Fragment {
     private ImageView b_enviar;
     private EditText edit_comentario;
     private Spinner spinnerUsuario, spinnerTarea;
+    private SpinnerAdapter adapterSpinnerUsuario;
     private ListView lista_comentarios;
+    private ArrayList<String> list_comments;
+    private ArrayAdapter<String> list_adapter;
     private CalendarView calendar;
     //private Long fechaCalendar = calendar.getDate();
     //private DateFormat formatoFecha = new SimpleDateFormat("dd-mm-yyyy");
     //private String fechaFinal = formatoFecha.format(fechaCalendar);
-    private ArrayList<String> list_items;
-    private ArrayAdapter<String> list_adapter;
+    private ArrayList<Usuario> lista_usuarios;
+    private ArrayAdapter<Usuario> adapter_lista_usuarios;
 
     private Usuario objetoUsuario;
 
@@ -92,12 +100,42 @@ public class UsuarioFragment extends Fragment {
         edit_comentario = v.findViewById(R.id.edit_text_comentar);
         calendar = v.findViewById(R.id.calendarUsuario);
         spinnerTarea = v.findViewById(R.id.spinnerTarea);
+
         lista_comentarios = v.findViewById(R.id.list_comentarios);
         registerForContextMenu(lista_comentarios);
-        list_items = new ArrayList<String>();
-        list_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, list_items);
+        list_comments = new ArrayList<String>();
+        list_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, list_comments);
         lista_comentarios.setAdapter(list_adapter);
+
         spinnerUsuario = (Spinner) v.findViewById(R.id.spinnerUsuario);
+        adapterSpinnerUsuario = new SpinnerAdapter() {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) { return null; }
+            @Override
+            public void registerDataSetObserver(DataSetObserver observer) { }
+            @Override
+            public void unregisterDataSetObserver(DataSetObserver observer) { }
+            @Override
+            public int getCount() { return 0; }
+            @Override
+            public Object getItem(int position) { return null; }
+            @Override
+            public long getItemId(int position) { return 0; }
+            @Override
+            public boolean hasStableIds() { return false; }
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) { return null; }
+            @Override
+            public int getItemViewType(int position) { return 0; }
+            @Override
+            public int getViewTypeCount() { return 0; }
+            @Override
+            public boolean isEmpty() { return false; }
+            };
+        spinnerUsuario.setAdapter(adapterSpinnerUsuario);
+        lista_usuarios = new ArrayList<Usuario>();
+        adapter_lista_usuarios = new ArrayAdapter<Usuario>(getActivity(), android.R.layout.simple_spinner_item, lista_usuarios);
+        adapter_lista_usuarios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         referenceUsuario = FirebaseDatabase.getInstance().getReference("Usuario").child("tasker-93d8e");
         //LISTENER BOTÓN ENVIAR
@@ -108,39 +146,30 @@ public class UsuarioFragment extends Fragment {
                     Toast.makeText(getContext(), "Escribe algo", Toast.LENGTH_SHORT).show();
                 } else {
                     String comentario = edit_comentario.getText().toString();
-                    list_items.add(comentario);
+                    list_comments.add(comentario);
                     list_adapter.notifyDataSetChanged();
                     edit_comentario.setText("");
                 }
             }
         });
-        lista_comentarios.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        spinnerUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "Click", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                referenceUsuario.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         });
-
-
-        /*referenceUsuario.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Usuario usuario = dataSnapshot.getValue(Usuario.class);
-
-                Log.d(TAG, "showData: id: " + usuario.getId());
-                Log.d(TAG, "showData: nombre: " + usuario.getNombre());
-                Log.d(TAG, "showData: edad: " + usuario.getEdad());
-                Log.d(TAG, "showData: email: " + usuario.getEmail());
-            }
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });*/
         return v;
     }
 
@@ -158,7 +187,7 @@ public class UsuarioFragment extends Fragment {
         AdapterView.AdapterContextMenuInfo adapterContextMenu = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()){
             case R.id.action_delete:
-                    list_items.remove(list_adapter.getItem(adapterContextMenu.position));
+                    list_comments.remove(list_adapter.getItem(adapterContextMenu.position));
                     list_adapter.notifyDataSetChanged();
             default:
                 return super.onOptionsItemSelected(item);
