@@ -3,11 +3,17 @@ package com.example.tasker;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.List;
 
 
 /**
@@ -22,6 +28,9 @@ public class ProyectoFragment extends Fragment {
 
     private Spinner spinnerProyecto;
     private ComunicaProyectoConActivity mListener;
+    private DatabaseReference referenceProyecto;
+    private FloatingActionButton añadirProyecto;
+    private Proyecto proyecto;
 
     public ProyectoFragment() {
         // Required empty public constructor
@@ -43,6 +52,18 @@ public class ProyectoFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.fragment_proyecto, container, false);
+
+        añadirProyecto = v.findViewById(R.id.añadir_proyecto);
+
+        referenceProyecto = FirebaseDatabase.getInstance().getReference();
+        /*añadirProyecto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Usuario> listaUsuarios = proyecto.getListaUsuarios();
+                Proyecto objetoProyecto = new Proyecto(listaUsuarios);
+                referenceProyecto.child("Proyecto").setValue(objetoProyecto);
+            }
+        });*/
 
         spinnerProyecto = (Spinner) v.findViewById(R.id.spinnerProyecto);
         return v;

@@ -29,6 +29,7 @@ public class PerfilFragment extends Fragment {
     private Button bGuardar, bEditar;
     private EditText edit_profile_name, edit_edad, edit_email;
     private DatabaseReference referencePerfil;
+
     public PerfilFragment() {
         // Required empty public constructor
     }

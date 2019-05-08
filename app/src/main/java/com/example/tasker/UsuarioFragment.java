@@ -132,7 +132,7 @@ public class UsuarioFragment extends Fragment {
             @Override
             public boolean isEmpty() { return false; }
             };
-        spinnerUsuario.setAdapter(adapterSpinnerUsuario);
+        //spinnerUsuario.setAdapter(adapterSpinnerUsuario);
         lista_usuarios = new ArrayList<Usuario>();
         adapter_lista_usuarios = new ArrayAdapter<Usuario>(getActivity(), android.R.layout.simple_spinner_item, lista_usuarios);
         adapter_lista_usuarios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -153,7 +153,7 @@ public class UsuarioFragment extends Fragment {
             }
         });
 
-        spinnerUsuario.setOnClickListener(new View.OnClickListener() {
+        /*spinnerUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 referenceUsuario.addValueEventListener(new ValueEventListener() {
@@ -167,9 +167,8 @@ public class UsuarioFragment extends Fragment {
 
                     }
                 });
-
             }
-        });
+        });*/
         return v;
     }
 
