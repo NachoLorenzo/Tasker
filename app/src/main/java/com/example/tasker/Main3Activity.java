@@ -2,12 +2,9 @@ package com.example.tasker;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,17 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
-import android.widget.Spinner;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class Main3Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         PerfilFragment.ComunicaPerfilconActivity,
         UsuarioFragment.ComunicaUsuarioConActivity,
-        ProyectoFragment.ComunicaProyectoConActivity {
+        ProyectoFragment.ComunicaProyectoConActivity,
+        NuevoProyectoFragment.ComunicaNuevoProyectoFragmentConActivity {
 
         Fragment fperfil, fusuario, fproyecto;
         FragmentManager fm, fm2, fm3;

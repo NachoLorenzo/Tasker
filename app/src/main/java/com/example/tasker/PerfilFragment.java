@@ -14,14 +14,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link PerfilFragment.ComunicaPerfilconActivity} interface
- * to handle interaction events.
- * Use the {@link PerfilFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PerfilFragment extends Fragment {
 
 
@@ -113,7 +105,7 @@ public class PerfilFragment extends Fragment {
         String id = referencePerfil.push().getKey();
 
         Usuario perfil = new Usuario(id, nombre, edad, email);
-        referencePerfil.child("Usuario").child(id).setValue(perfil);
+        referencePerfil.child("Perfiles").child(id).setValue(perfil);
 
     }
     /**

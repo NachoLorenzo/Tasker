@@ -55,6 +55,7 @@ import static android.support.constraint.Constraints.TAG;
 public class UsuarioFragment extends Fragment {
 
 
+    private String nombre, edad, email, idUsuario;
     private ComunicaUsuarioConActivity mListener;
     private ImageView b_enviar;
     private EditText edit_comentario;
@@ -211,11 +212,14 @@ public class UsuarioFragment extends Fragment {
     }
 
     public void registrarUsuario(){
-        String nombre = spinnerUsuario.getSelectedItem().toString();
-        String edad = objetoUsuario.getEdad().toString();
-        String email = objetoUsuario.getEmail().toString();
+        nombre = spinnerUsuario.getSelectedItem().toString();
+        edad = objetoUsuario.getEdad();
+        email = objetoUsuario.getEmail();
+        idUsuario = referenceUsuario.push().getKey();
         //String fecha = fechaFinal.toString();
-        String tarea = spinnerTarea.getSelectedItem().toString();
+        //String tarea = spinnerTarea.getSelectedItem().toString();
+        Usuario usuario = new Usuario(nombre, edad, email, idUsuario);
+        referenceUsuario.child("Usuario").child(idUsuario).setValue(usuario);
     }
 
     public interface ComunicaUsuarioConActivity {

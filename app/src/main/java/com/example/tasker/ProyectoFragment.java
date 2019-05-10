@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,8 @@ public class ProyectoFragment extends Fragment {
     private DatabaseReference referenceProyecto;
     private FloatingActionButton añadirProyecto;
     private Proyecto proyecto;
+    private Fragment fNuevoProyecto;
+    private FragmentTransaction ft;
 
     public ProyectoFragment() {
         // Required empty public constructor
@@ -56,14 +60,16 @@ public class ProyectoFragment extends Fragment {
         añadirProyecto = v.findViewById(R.id.añadir_proyecto);
 
         referenceProyecto = FirebaseDatabase.getInstance().getReference();
-        /*añadirProyecto.setOnClickListener(new View.OnClickListener() {
+        añadirProyecto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Usuario> listaUsuarios = proyecto.getListaUsuarios();
-                Proyecto objetoProyecto = new Proyecto(listaUsuarios);
-                referenceProyecto.child("Proyecto").setValue(objetoProyecto);
+                fNuevoProyecto = new NuevoProyectoFragment().newInstance(" "," ");
+                FragmentManager fnp = getFragmentManager();
+                ft = fnp.beginTransaction();
+                ft.replace(R.id.fr_contenido_ppal, fNuevoProyecto);
+                ft.commit();
             }
-        });*/
+        });
 
         spinnerProyecto = (Spinner) v.findViewById(R.id.spinnerProyecto);
         return v;
