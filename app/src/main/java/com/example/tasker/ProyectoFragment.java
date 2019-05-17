@@ -8,17 +8,22 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Spinner;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +51,15 @@ public class ProyectoFragment extends Fragment {
     private Fragment fNuevoProyecto;
     private FragmentTransaction ft;
     private FragmentManager fm;
-    private ListView listaUsuarios, listaTareas;
+    private RecyclerView listaUsuarios, listaTareas;
     private ArrayList<Usuario> arrayUsuarios;
     private ArrayList<Tarea> arrayTareas;
     private ArrayAdapter<Usuario> adapterListaUsuarios;
     private ArrayAdapter<Tarea> adapterListaTareas;
+
+    private ArrayList<Proyecto> llistatProjectes;
+    private ArrayList<String> llistatNom_UsuarisProjecte;
+    ArrayList<String> llistatNomsProjecte;
 
     public ProyectoFragment() {
         // Required empty public constructor
@@ -65,18 +74,43 @@ public class ProyectoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Inicialitzem l'arrayList de projectes
+        llistatProjectes = new ArrayList();
+        llistatNomsProjecte = new ArrayList<>();
+        //FIREBASE
+        referenceProyecto = FirebaseDatabase.getInstance().getReference().child("Proyectos");
+
+        //Consultem la llista de projectes
+        referenceProyecto.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot d: dataSnapshot.getChildren()){
+                    Proyecto unProjecte = d.getValue(Proyecto.class);
+                    Log.d("MANEL","he llegit:"+unProjecte.getNombreProyecto());
+                    llistatProjectes.add(unProjecte);
+                    llistatNomsProjecte.add(unProjecte.getNombreProyecto());
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View v;
         v = inflater.inflate(R.layout.fragment_proyecto, container, false);
 
-        //FIREBASE
-        referenceProyecto = FirebaseDatabase.getInstance().getReference();
+
+
         //SPINNER PARA SELECCIONAR PROYECTO
-        spinnerProyecto = (Spinner) v.findViewById(R.id.spinnerProyecto);
+        spinnerProyecto = v.findViewById(R.id.spinnerProyecto);
 
         //LISTAS Y ADAPTERS PARA AÑADIR A LOS FLOATING ACTION BUTTON
         listaUsuarios = v.findViewById(R.id.lista_usuarios);
@@ -126,7 +160,59 @@ public class ProyectoFragment extends Fragment {
             }
         });
 
+        //Adaptador de l'spinner
+
+
+        ArrayAdapter<String> adaptadorSpinner = new ArrayAdapter<>(this.getActivity().getApplicationContext(),android.R.layout.simple_spinner_item,llistatNomsProjecte);
+        adaptadorSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Omplim l'spinner amb el llistat de projectes
+        Log.d("MANEL","tinc: "+llistatProjectes.size());
+        spinnerProyecto.setAdapter(adaptadorSpinner);
+        spinnerProyecto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                //Consultem en firebase pels usuaris del projecte seleccionat
+                //mostraUsuarisProjecte(i);
+                Log.d("MANEL","has triat el projecte "+adapterView.getItemAtPosition(i));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         return v;
+    }
+
+    private void mostraUsuarisProjecte(int posicioProjecte){
+        Proyecto proyectoSeleccionadoPorUsuario = llistatProjectes.get(posicioProjecte);
+        ArrayList<String> llistatID_UsuarisProjecte = proyectoSeleccionadoPorUsuario.getId_usu();
+
+
+        for(String id_usu:llistatID_UsuarisProjecte){
+            //FIREBASE
+            referenceProyecto = FirebaseDatabase.getInstance().getReference().child("Perfiles").child("id");
+            referenceProyecto.equalTo(id_usu);
+            //Consultem la llista de projectes
+            referenceProyecto.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot d: dataSnapshot.getChildren()){
+                        Perfil unPerfil = d.getValue(Perfil.class);
+                        Log.d("MANEL","he llegit:"+unPerfil.getNombre());
+                        llistatNom_UsuarisProjecte.add(unPerfil.getNombre());
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
+            });
+        }
+
     }
 
     private void animarFab(){
@@ -147,12 +233,7 @@ public class ProyectoFragment extends Fragment {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
 
     @Override
     public void onAttach(Context context) {

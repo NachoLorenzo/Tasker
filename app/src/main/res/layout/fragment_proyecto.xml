@@ -11,7 +11,6 @@
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -39,22 +38,22 @@
             android:layout_height="wrap_content"
             android:text="Lista de usuarios del proyecto:"
             android:layout_gravity="center"/>
-        <ListView
+
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/lista_usuarios"
             android:layout_width="match_parent"
-            android:layout_height="350dp"
-            android:background="@color/cardview_shadow_start_color">
-        </ListView>
+            android:layout_height="350dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lista de tareas:"
             android:layout_gravity="center"/>
-        <ListView
+
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/lista_tareas"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:background="@color/cardview_shadow_start_color"/>
+            android:layout_height="300dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/añadir_usuario"
@@ -80,8 +79,8 @@
             android:id="@+id/añadir"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/plus"
-            android:layout_gravity="bottom|end"/>
+            android:layout_gravity="bottom|end"
+            android:src="@android:drawable/ic_input_add" />
 
     </LinearLayout>
     </ScrollView>

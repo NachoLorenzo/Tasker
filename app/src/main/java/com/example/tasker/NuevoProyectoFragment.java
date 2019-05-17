@@ -89,7 +89,9 @@ public class NuevoProyectoFragment extends Fragment {
     public void guardarProyecto(){
         String nombreProyecto = editTextNombreProyecto.getText().toString();
         String idProyecto = referenceNuevoProyecto.push().getKey();
-        Proyecto proyecto = new Proyecto(nombreProyecto, idProyecto);
+
+        //OJOOOO estem creant un projecte ambla llista usuaris a null
+        Proyecto proyecto = new Proyecto(nombreProyecto, idProyecto,null);
         referenceNuevoProyecto.child("Proyectos").child(idProyecto).setValue(proyecto);
     }
 
