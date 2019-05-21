@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NuevaTareaFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp">
+
+        <ImageView
+            android:id="@+id/image_proyecto"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/profile_photo"/>
+
+        <TextView
+            android:id="@+id/label_tarea"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tarea:"
+            android:layout_below="@id/image_proyecto"/>
+        <EditText
+            android:id="@+id/edit_text_nombre_tarea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/label_tarea" />
+        <TextView
+            android:id="@+id/descripciónTarea"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Descripción:"
+            android:layout_below="@+id/edit_text_nombre_tarea"/>
+        <EditText
+            android:id="@+id/edit_DescripciónTarea"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_below="@id/descripciónTarea"/>
+        <Button
+            android:id="@+id/button_guardar_tarea"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="-50dp"
+            android:layout_below="@id/edit_DescripciónTarea"
+            android:text="Guardar tarea" />
+
+    </RelativeLayout>
+
+</FrameLayout>

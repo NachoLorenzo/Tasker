@@ -26,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -43,12 +42,12 @@ public class ProyectoFragment extends Fragment {
     private ComunicaProyectoConActivity mListener;
     private DatabaseReference referenceProyecto;
 
-    private FloatingActionButton añadir, añadirProyecto, añadirUsuario;
+    private FloatingActionButton añadir, añadirProyecto, añadirUsuario, añadirTarea;
     Animation fabOpen, fabClose, rotarForward, rotarBackward;
     boolean isOpen = false;
 
     private Proyecto proyecto;
-    private Fragment fNuevoProyecto;
+    private Fragment fNuevoProyecto, fNuevaTarea;
     private FragmentTransaction ft;
     private FragmentManager fm;
     private RecyclerView listaUsuarios, listaTareas;
@@ -57,9 +56,9 @@ public class ProyectoFragment extends Fragment {
     private ArrayAdapter<Usuario> adapterListaUsuarios;
     private ArrayAdapter<Tarea> adapterListaTareas;
 
-    private ArrayList<Proyecto> llistatProjectes;
-    private ArrayList<String> llistatNom_UsuarisProjecte;
-    ArrayList<String> llistatNomsProjecte;
+    private ArrayList<Proyecto> listadoProyectos;
+    private ArrayList<String> listadoNombres_UsuariosProyecto;
+    ArrayList<String> listadoNombresProyectos;
 
     public ProyectoFragment() {
         // Required empty public constructor
@@ -74,23 +73,22 @@ public class ProyectoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Inicialitzem l'arrayList de projectes
-        llistatProjectes = new ArrayList();
-        llistatNomsProjecte = new ArrayList<>();
+        //Inicializamos arrayList de proyectos
+        listadoProyectos = new ArrayList();
+        listadoNombresProyectos = new ArrayList<>();
         //FIREBASE
         referenceProyecto = FirebaseDatabase.getInstance().getReference().child("Proyectos");
 
-        //Consultem la llista de projectes
+        //Consultamos la lista de proyectos
         referenceProyecto.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot d: dataSnapshot.getChildren()){
-                    Proyecto unProjecte = d.getValue(Proyecto.class);
-                    Log.d("MANEL","he llegit:"+unProjecte.getNombreProyecto());
-                    llistatProjectes.add(unProjecte);
-                    llistatNomsProjecte.add(unProjecte.getNombreProyecto());
+                    Proyecto unProyecto = d.getValue(Proyecto.class);
+                    Log.d("TAG 1","he leído:"+unProyecto.getNombreProyecto());
+                    listadoProyectos.add(unProyecto);
+                    listadoNombresProyectos.add(unProyecto.getNombreProyecto());
                 }
-
             }
 
             @Override
@@ -125,9 +123,10 @@ public class ProyectoFragment extends Fragment {
         adapterListaTareas = new ArrayAdapter<Tarea>(getActivity(), android.R.layout.simple_list_item_1, arrayTareas);
 
         //BLOQUE DE FLOATING ACTION BUTTON
-        añadir = (FloatingActionButton) v.findViewById(R.id.añadir);
-        añadirProyecto = (FloatingActionButton) v.findViewById(R.id.añadir_proyecto);
-        añadirUsuario = (FloatingActionButton) v.findViewById(R.id.añadir_usuario);
+        añadir = v.findViewById(R.id.añadir);
+        añadirProyecto = v.findViewById(R.id.añadir_proyecto);
+        añadirUsuario = v.findViewById(R.id.añadir_usuario);
+        añadirTarea = v.findViewById(R.id.añadir_tarea);
 
         //ANIMACIONES DEL FLOATING ACTION BUTTON
         fabOpen = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
@@ -160,20 +159,29 @@ public class ProyectoFragment extends Fragment {
             }
         });
 
-        //Adaptador de l'spinner
+        añadirTarea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fNuevaTarea = new NuevaTareaFragment().newInstance();
+                fm = getFragmentManager();
+                ft = fm.beginTransaction();
+                ft.replace(R.id.fr_contenido_ppal, fNuevaTarea);
+                ft.commit();
+            }
+        });
 
-
-        ArrayAdapter<String> adaptadorSpinner = new ArrayAdapter<>(this.getActivity().getApplicationContext(),android.R.layout.simple_spinner_item,llistatNomsProjecte);
+        //Adaptador del spinner
+        ArrayAdapter<String> adaptadorSpinner = new ArrayAdapter<>(this.getActivity().getApplicationContext(),android.R.layout.simple_spinner_item, listadoNombresProyectos);
         adaptadorSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Omplim l'spinner amb el llistat de projectes
-        Log.d("MANEL","tinc: "+llistatProjectes.size());
+        Log.d("TAG 2","tengo: "+ listadoProyectos.size());
         spinnerProyecto.setAdapter(adaptadorSpinner);
         spinnerProyecto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 //Consultem en firebase pels usuaris del projecte seleccionat
-                //mostraUsuarisProjecte(i);
-                Log.d("MANEL","has triat el projecte "+adapterView.getItemAtPosition(i));
+                mostrarUsuariosDelProyecto(i);
+                Log.d("TAG 3","has elegido el proyecto: "+adapterView.getItemAtPosition(i));
             }
 
             @Override
@@ -185,23 +193,23 @@ public class ProyectoFragment extends Fragment {
         return v;
     }
 
-    private void mostraUsuarisProjecte(int posicioProjecte){
-        Proyecto proyectoSeleccionadoPorUsuario = llistatProjectes.get(posicioProjecte);
-        ArrayList<String> llistatID_UsuarisProjecte = proyectoSeleccionadoPorUsuario.getId_usu();
+    private void mostrarUsuariosDelProyecto(int posicionProyecto){
+        Proyecto proyectoSeleccionadoPorUsuario = listadoProyectos.get(posicionProyecto);
+        ArrayList<String> listaIDUsuariosProyecto = proyectoSeleccionadoPorUsuario.getId_usu();
 
 
-        for(String id_usu:llistatID_UsuarisProjecte){
+        for(String id_usu : listaIDUsuariosProyecto){
             //FIREBASE
             referenceProyecto = FirebaseDatabase.getInstance().getReference().child("Perfiles").child("id");
             referenceProyecto.equalTo(id_usu);
-            //Consultem la llista de projectes
+            //Consultamos la lista de proyectos
             referenceProyecto.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for(DataSnapshot d: dataSnapshot.getChildren()){
                         Perfil unPerfil = d.getValue(Perfil.class);
-                        Log.d("MANEL","he llegit:"+unPerfil.getNombre());
-                        llistatNom_UsuarisProjecte.add(unPerfil.getNombre());
+                        Log.d("TAG 1","he leído:"+unPerfil.getNombre());
+                        listadoNombres_UsuariosProyecto.add(unPerfil.getNombre());
                     }
 
                 }
@@ -220,15 +228,19 @@ public class ProyectoFragment extends Fragment {
             añadir.startAnimation(rotarForward);
             añadirProyecto.startAnimation(fabClose);
             añadirUsuario.startAnimation(fabClose);
+            añadirTarea.startAnimation(fabClose);
             añadirProyecto.setClickable(false);
             añadirUsuario.setClickable(false);
+            añadirTarea.setClickable(false);
             isOpen=false;
         }else{
             añadir.startAnimation(rotarBackward);
             añadirProyecto.startAnimation(fabOpen);
             añadirUsuario.startAnimation(fabOpen);
+            añadirTarea.startAnimation(fabOpen);
             añadirProyecto.setClickable(true);
             añadirUsuario.setClickable(true);
+            añadirTarea.setClickable(true);
             isOpen=true;
         }
     }

@@ -19,7 +19,8 @@ public class Main3Activity extends AppCompatActivity
         PerfilFragment.ComunicaPerfilconActivity,
         UsuarioFragment.ComunicaUsuarioConActivity,
         ProyectoFragment.ComunicaProyectoConActivity,
-        NuevoProyectoFragment.ComunicaNuevoProyectoFragmentConActivity {
+        NuevoProyectoFragment.ComunicaNuevoProyectoFragmentConActivity,
+        NuevaTareaFragment.ComunicaNuevaTareaConActivity {
 
         Fragment fperfil, fusuario, fproyecto;
         FragmentManager fm, fm2, fm3;

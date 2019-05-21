@@ -76,6 +76,16 @@
             android:visibility="invisible" />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/añadir_tarea"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:src="@android:drawable/ic_menu_today"
+            android:visibility="invisible" />
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/añadir"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
