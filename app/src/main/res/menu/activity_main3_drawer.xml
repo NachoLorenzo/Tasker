@@ -6,7 +6,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_perfil"
-            android:icon="@drawable/profile_photo"
+            android:icon="@drawable/ic_profile"
             android:title="Perfil" />
         <item
             android:id="@+id/nav_proyectos"
