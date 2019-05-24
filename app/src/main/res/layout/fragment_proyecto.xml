@@ -43,7 +43,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lista_usuarios"
             android:layout_width="match_parent"
-            android:layout_height="350dp" />
+            android:layout_height="350dp"
+            android:background="@color/cardview_shadow_start_color"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -54,7 +55,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lista_tareas"
             android:layout_width="match_parent"
-            android:layout_height="300dp" />
+            android:layout_height="300dp"
+            android:background="@color/cardview_shadow_start_color"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/añadir_usuario"

@@ -91,7 +91,7 @@ public class NuevoProyectoFragment extends Fragment {
         String idProyecto = referenceNuevoProyecto.push().getKey();
 
         // OJO!!!!! Creamos un proyecto con lista de usuarios a NULL
-        Proyecto proyecto = new Proyecto(nombreProyecto, idProyecto,null);
+        Proyecto proyecto = new Proyecto(nombreProyecto, idProyecto,null,null);
         referenceNuevoProyecto.child("Proyectos").child(idProyecto).setValue(proyecto);
     }
 

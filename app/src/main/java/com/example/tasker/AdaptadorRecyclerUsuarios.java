@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class AdaptadorRecyclerUsuaris extends RecyclerView.Adapter<AdaptadorRecyclerUsuaris.UsuariHolder>{
+public class AdaptadorRecyclerUsuarios extends RecyclerView.Adapter<AdaptadorRecyclerUsuarios.UsuariHolder>{
 
     private ArrayList<Perfil> llistatUsuarisAMostrar;
 
@@ -25,21 +25,21 @@ public class AdaptadorRecyclerUsuaris extends RecyclerView.Adapter<AdaptadorRecy
         }
     }
 
-    public AdaptadorRecyclerUsuaris(ArrayList<Perfil> llistat){
+    public AdaptadorRecyclerUsuarios(ArrayList<Perfil> llistat){
         llistatUsuarisAMostrar=llistat;
 
     }
 
     @Override
-    public AdaptadorRecyclerUsuaris.UsuariHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public AdaptadorRecyclerUsuarios.UsuariHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View v;
-        v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.element_llistat_usuaris_del_projecte,viewGroup,false);
+        v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.elemento_lista_usuarios_proyecto,viewGroup,false);
 
         return new UsuariHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AdaptadorRecyclerUsuaris.UsuariHolder usuariHolder, int i) {
+    public void onBindViewHolder(@NonNull AdaptadorRecyclerUsuarios.UsuariHolder usuariHolder, int i) {
         usuariHolder.nom.setText(llistatUsuarisAMostrar.get(i).getNombre());
         usuariHolder.email.setText(llistatUsuarisAMostrar.get(i).getEmail());
     }

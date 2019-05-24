@@ -21,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +30,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -58,20 +56,16 @@ public class ProyectoFragment extends Fragment {
     private FragmentManager fm;
     private RecyclerView listaUsuarios, listaTareas;
     private RecyclerView.LayoutManager lm;
-    private ArrayList<Usuario> arrayUsuarios;
-    private ArrayList<Tarea> arrayTareas;
-    private ArrayAdapter<Usuario> adapterListaUsuarios;
-    private ArrayAdapter<Tarea> adapterListaTareas;
-    private AdaptadorRecyclerUsuaris aru;
+    private ArrayList<Tarea> listadoTareasProyecto;
+    private AdaptadorRecyclerUsuarios aru;
+    private AdaptadorRecyclerTareas art;
+
 
     private ArrayList<Proyecto> listadoProyectos;
-    private ArrayList<String> listadoNombres_UsuariosProyecto;
-    ArrayList<String> listadoNombresProyectos;
-    private ArrayList<Proyecto> llistatProjectes;
-    private ArrayList<Perfil> llistatPerfilsProjecte;
-    private HashMap<String,Perfil> llistaDeTotsElsPerfils = new HashMap<>();
-    private ArrayList<String> llistatNomsProjecte;
-    private  ArrayList<Perfil> llistatPerfils;
+    private ArrayList<Perfil> listadoPerfilesProyecto;
+    private HashMap<String,Perfil> listadoDePerfiles = new HashMap<>();
+    private HashMap<String,Tarea> listadoDeTareas = new HashMap<>();
+    private ArrayList<String> listadoNombresProyecto;
 
     public ProyectoFragment() {
         // Required empty public constructor
@@ -84,9 +78,8 @@ public class ProyectoFragment extends Fragment {
     }
 
 
-    public void consultaProjectes() {
+    public void consultaProyectos() {
         super.onStart();
-
 
     }
 
@@ -102,8 +95,6 @@ public class ProyectoFragment extends Fragment {
         View v;
         v = inflater.inflate(R.layout.fragment_proyecto, container, false);
 
-
-
         //SPINNER PARA SELECCIONAR PROYECTO
         spinnerProyecto = v.findViewById(R.id.spinnerProyecto);
 
@@ -113,11 +104,7 @@ public class ProyectoFragment extends Fragment {
         registerForContextMenu(listaUsuarios);
         registerForContextMenu(listaTareas);
 
-
-        arrayTareas = new ArrayList<Tarea>();
-
-
-        adapterListaTareas = new ArrayAdapter<Tarea>(getActivity(), android.R.layout.simple_list_item_1, arrayTareas);
+        listadoTareasProyecto = new ArrayList<Tarea>();
 
         //BLOQUE DE FLOATING ACTION BUTTON
         añadir = v.findViewById(R.id.añadir);
@@ -156,51 +143,63 @@ public class ProyectoFragment extends Fragment {
             }
         });
 
+        añadirTarea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fNuevaTarea = new NuevaTareaFragment().newInstance();
+                fm = getFragmentManager();
+                ft = fm.beginTransaction();
+                ft.replace(R.id.fr_contenido_ppal, fNuevaTarea);
+                ft.commit();
+            }
+        });
+
         //SPiNNER
 
-        //Inicialitzem l'arrayList de projectes
-        llistatProjectes = new ArrayList<Proyecto>(); //ArrayList amb TOTS els projectes disponibles
-        llistatNomsProjecte = new ArrayList<>(); //ArrayList només amb els noms dels projectes (per a l'spinner)
-        omplirSpinnerDeProjectes(); //Consulta firebase i ompli l'spinner amb els noms dels projectes.
+        //Inicializamos el arrayList de proyectos
+        listadoProyectos = new ArrayList<Proyecto>(); //ArrayList con TODOS los proyectos disponibles
+        listadoNombresProyecto = new ArrayList<>(); //ArrayList solo con nombres de proyectos para el Spinner
+        llenaSpinnerDeNombres(); //Consulta firebase y llena el spinner con nombres
 
         return v;
     }
 
-    private void omplirSpinnerDeProjectes(){
+    private void llenaSpinnerDeNombres(){
         //FIREBASE
-        Query consultaListaProjectes= FirebaseDatabase.getInstance().getReference().child("Proyectos").orderByChild("nombreProyecto");
+        Query consultaListaProyectos= FirebaseDatabase.getInstance().getReference().child("Proyectos").orderByChild("nombreProyecto");
 
-        //Consultem la llista de projectes
-        consultaListaProjectes.addValueEventListener(new ValueEventListener() {
+        //Consultamos la lista de proyectos
+        consultaListaProyectos.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot d: dataSnapshot.getChildren()){
-                    Proyecto unProjecte = d.getValue(Proyecto.class);
-                    ArrayList <String> llistaDusuarisDelProjecte = new ArrayList<String>();
-                    //obtenim el llistat d'usuaris del projecte.
-                    for(DataSnapshot unUsuari: d.child("usuarios").getChildren()){
-                        llistaDusuarisDelProjecte.add(unUsuari.getValue(String.class));
+                    Proyecto unProyecto = d.getValue(Proyecto.class);
+                    ArrayList <String> listaUsuariosDelProyecto = new ArrayList<String>();
+                    //Obtenemos la lista
+                    for(DataSnapshot unUsuario: d.child("usuarios").getChildren()){
+                        listaUsuariosDelProyecto.add(unUsuario.getValue(String.class));
                     }
-                    // Afegiml'arraylist d'usuaris del projecte a l'objecte Projecte
-                    unProjecte.setId_usu(llistaDusuarisDelProjecte);
-                    llistatProjectes.add(unProjecte);
-                    llistatNomsProjecte.add(unProjecte.getNombreProyecto());
+                    //Añadimos el arrayList de usuarios del proyecto al objeto Proyecto
+                    unProyecto.setId_usu(listaUsuariosDelProyecto);
+                    listadoProyectos.add(unProyecto);
+                    listadoNombresProyecto.add(unProyecto.getNombreProyecto());
                 }
 
-                ArrayAdapter<String> adaptadorSpinner = new ArrayAdapter<>(getActivity().getApplicationContext(),android.R.layout.simple_spinner_item,llistatNomsProjecte);
+                ArrayAdapter<String> adaptadorSpinner = new ArrayAdapter<>(getActivity().getApplicationContext(),android.R.layout.simple_spinner_item, listadoNombresProyecto);
                 adaptadorSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-                //Omplim l'spinner amb el llistat de projectes
+                //Llenamos el spinner con el listado de proyectos
                 spinnerProyecto.setAdapter(adaptadorSpinner);
                 spinnerProyecto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        //Consultem en firebase pels usuaris del projecte seleccionat
+                        //Consultamos Firebase por los usuarios del proyecto seleccionado
                         //mostraUsuarisProjecte(i);
-                        carregaTotsElsPerfilsDelProjecte(i);
-                        ompliRecyclerUsuaris();
-                        carregarTotesLesTasquesDelProjecte();
-                       // omplirRecyclerTasques();
+                        cargarTareasDelProyecto(i);
+                        cargarPerfilesDelProyecto(i);
+                        llenarRecyclerUsuarios();
+                        llenarRecyclerTareas();
+
                     }
 
                     @Override
@@ -218,42 +217,43 @@ public class ProyectoFragment extends Fragment {
 
     }
 
-    private void carregarTotesLesTasquesDelProjecte() {
-
+    private void llenarRecyclerTareas() {
+        // LayoutManager del RecyclerView Tareas
+        lm = new LinearLayoutManager(getActivity().getApplicationContext());
+        listaTareas.setLayoutManager(lm);
+        art = new AdaptadorRecyclerTareas(listadoTareasProyecto);
+        listaTareas.setAdapter(art);
     }
 
-    private void ompliRecyclerUsuaris() {
+    private void llenarRecyclerUsuarios() {
         // LayoutManager del RecyclerView Usuarios
         lm = new LinearLayoutManager(getActivity().getApplicationContext());
         listaUsuarios.setLayoutManager(lm);
-         aru=new AdaptadorRecyclerUsuaris(llistatPerfilsProjecte);
+        aru=new AdaptadorRecyclerUsuarios(listadoPerfilesProyecto);
         listaUsuarios.setAdapter(aru);
 
     }
 
-    private void carregaTotsElsPerfilsDelProjecte(int posicioProjecte) {
-        Proyecto proyectoSeleccionadoPorUsuario = llistatProjectes.get(posicioProjecte);
-        final ArrayList<String> identificadorsUsuarisProjecte;
-         llistatPerfilsProjecte = new ArrayList<>();
+    private void cargarPerfilesDelProyecto(int posProyecto) {
+        Proyecto proyectoSeleccionado = listadoProyectos.get(posProyecto);
+        final ArrayList<String> idUsuariosProyecto;
+        listadoPerfilesProyecto = new ArrayList<>();
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Perfiles");
-        identificadorsUsuarisProjecte = proyectoSeleccionadoPorUsuario.getId_usu();
+        idUsuariosProyecto = proyectoSeleccionado.getId_usu();
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot d : dataSnapshot.getChildren()) {
                     Perfil unPerfil = d.getValue(Perfil.class);
-                    //obtenim el llistat de TOTS perfils.
-                    llistaDeTotsElsPerfils.put(unPerfil.getId(), unPerfil);
-                    Log.d("MANEL","Components: "+unPerfil.getNombre()+"-"+unPerfil.getEmail());
+                    //Obtenemos el listado de TODOs los perfiles
+                    listadoDePerfiles.put(unPerfil.getId(), unPerfil);
                 }
-                //Obtenim un ArrayList amb només els perfils del projecte seleccionat
-                for(String idPerfil:identificadorsUsuarisProjecte){
-                    if(llistaDeTotsElsPerfils.containsKey(idPerfil)){
-                        Log.d("MANEL","Usuaris del projecte: "+llistaDeTotsElsPerfils.get(idPerfil).getNombre()+"-"+llistaDeTotsElsPerfils.get(idPerfil).getEmail());
-                        llistatPerfilsProjecte.add(llistaDeTotsElsPerfils.get(idPerfil));
-
+                //Obtenemos un arrayList solo con los usuarios seleccionados
+                for(String idPerfil:idUsuariosProyecto){
+                    if(listadoDePerfiles.containsKey(idPerfil)){
+                        listadoPerfilesProyecto.add(listadoDePerfiles.get(idPerfil));
                     }
                 }
                 aru.notifyDataSetChanged();
@@ -265,6 +265,38 @@ public class ProyectoFragment extends Fragment {
 
             }
 
+        });
+    }
+
+    private void cargarTareasDelProyecto(int posProyecto){
+        Proyecto proyectoSeleccionado = listadoProyectos.get(posProyecto);
+        final ArrayList<String> idTareasProyecto;
+        listadoTareasProyecto = new ArrayList<>();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Tareas");
+        idTareasProyecto = proyectoSeleccionado.getId_tareas();
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    Tarea unaTarea = data.getValue(Tarea.class);
+                    //Obtenemos el listado de TODAS las tareas
+                    listadoDeTareas.put(unaTarea.getId(), unaTarea);
+                }
+                //Obtenemos el listado solo con las tareas seleccionadas
+                for(String idTarea:idTareasProyecto){
+                    if(listadoDeTareas.containsKey(idTarea)){
+                        listadoTareasProyecto.add(listadoDeTareas.get(idTarea));
+                    }
+                }
+                art.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
         });
     }
 
@@ -297,7 +329,7 @@ public class ProyectoFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof ComunicaProyectoConActivity) {
             mListener = (ComunicaProyectoConActivity) context;
-            consultaProjectes();
+            consultaProyectos();
         } else {
             throw new RuntimeException(context.toString()
                     + " tienes que implementar la interfaz ComunicaProyectoConActivity");
