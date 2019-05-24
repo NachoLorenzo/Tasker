@@ -179,8 +179,8 @@ public class ProyectoFragment extends Fragment {
                     for(DataSnapshot unUsuario: d.child("usuarios").getChildren()){
                         listaUsuariosDelProyecto.add(unUsuario.getValue(String.class));
                     }
-                    for(DataSnapshot unUsuario: d.child("lista_tareas").getChildren()){
-                        listaTareasDelProyecto.add(unUsuario.getValue(String.class));
+                    for(DataSnapshot unaTarea: d.child("lista_tareas").getChildren()){
+                        listaTareasDelProyecto.add(unaTarea.getValue(String.class));
                     }
                     //Añadimos el arrayList de usuarios del proyecto al objeto Proyecto
                     unProyecto.setId_usu(listaUsuariosDelProyecto);
