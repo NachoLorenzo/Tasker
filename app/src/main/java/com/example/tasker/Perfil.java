@@ -5,12 +5,12 @@ public class Perfil {
     String id;
     String email;
     String nombre;
-    int edad;
+    String edad;
 
     public Perfil() {
     }
 
-    public Perfil(String id, String email, String nombre, int edad) {
+    public Perfil(String id, String email, String nombre, String edad) {
         this.id = id;
         this.email = email;
         this.nombre = nombre;
@@ -41,11 +41,11 @@ public class Perfil {
         this.nombre = nombre;
     }
 
-    public int getEdad() {
+    public String getEdad() {
         return edad;
     }
 
-    public void setEdad(int edad) {
+    public void setEdad(String edad) {
         this.edad = edad;
     }
 }

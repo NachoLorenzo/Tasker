@@ -3,11 +3,13 @@ package com.example.tasker;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,13 +21,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -51,6 +57,7 @@ public class ProyectoFragment extends Fragment {
     private FragmentTransaction ft;
     private FragmentManager fm;
     private RecyclerView listaUsuarios, listaTareas;
+    private RecyclerView.LayoutManager lm;
     private ArrayList<Usuario> arrayUsuarios;
     private ArrayList<Tarea> arrayTareas;
     private ArrayAdapter<Usuario> adapterListaUsuarios;
@@ -59,6 +66,11 @@ public class ProyectoFragment extends Fragment {
     private ArrayList<Proyecto> listadoProyectos;
     private ArrayList<String> listadoNombres_UsuariosProyecto;
     ArrayList<String> listadoNombresProyectos;
+    private ArrayList<Proyecto> llistatProjectes;
+    private ArrayList<Perfil> llistatPerfilsProjecte;
+    private HashMap<String,Perfil> llistaDeTotsElsPerfils = new HashMap<>();
+    private ArrayList<String> llistatNomsProjecte;
+    private  ArrayList<Perfil> llistatPerfils;
 
     public ProyectoFragment() {
         // Required empty public constructor
@@ -70,33 +82,17 @@ public class ProyectoFragment extends Fragment {
         return fragment;
     }
 
+
+    public void consultaProjectes() {
+        super.onStart();
+
+
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Inicializamos arrayList de proyectos
-        listadoProyectos = new ArrayList();
-        listadoNombresProyectos = new ArrayList<>();
-        //FIREBASE
-        referenceProyecto = FirebaseDatabase.getInstance().getReference().child("Proyectos");
-
-        //Consultamos la lista de proyectos
-        referenceProyecto.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot d: dataSnapshot.getChildren()){
-                    Proyecto unProyecto = d.getValue(Proyecto.class);
-                    Log.d("TAG 1","he leído:"+unProyecto.getNombreProyecto());
-                    listadoProyectos.add(unProyecto);
-                    listadoNombresProyectos.add(unProyecto.getNombreProyecto());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
-    }
+           }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,10 +112,12 @@ public class ProyectoFragment extends Fragment {
         registerForContextMenu(listaUsuarios);
         registerForContextMenu(listaTareas);
 
-        arrayUsuarios = new ArrayList<Usuario>();
-        arrayTareas = new ArrayList<Tarea>();
 
-        adapterListaUsuarios = new ArrayAdapter<Usuario>(getActivity(), android.R.layout.simple_list_item_1, arrayUsuarios);
+        arrayTareas = new ArrayList<Tarea>();
+        // LayoutManager del RecyclerView Usuarios
+        lm = new LinearLayoutManager(getActivity().getApplicationContext());
+        listaUsuarios.setLayoutManager(lm);
+
         adapterListaTareas = new ArrayAdapter<Tarea>(getActivity(), android.R.layout.simple_list_item_1, arrayTareas);
 
         //BLOQUE DE FLOATING ACTION BUTTON
@@ -159,68 +157,105 @@ public class ProyectoFragment extends Fragment {
             }
         });
 
-        añadirTarea.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fNuevaTarea = new NuevaTareaFragment().newInstance();
-                fm = getFragmentManager();
-                ft = fm.beginTransaction();
-                ft.replace(R.id.fr_contenido_ppal, fNuevaTarea);
-                ft.commit();
-            }
-        });
+        //SPiNNER
 
-        //Adaptador del spinner
-        ArrayAdapter<String> adaptadorSpinner = new ArrayAdapter<>(this.getActivity().getApplicationContext(),android.R.layout.simple_spinner_item, listadoNombresProyectos);
-        adaptadorSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //Omplim l'spinner amb el llistat de projectes
-        Log.d("TAG 2","tengo: "+ listadoProyectos.size());
-        spinnerProyecto.setAdapter(adaptadorSpinner);
-        spinnerProyecto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                //Consultem en firebase pels usuaris del projecte seleccionat
-                mostrarUsuariosDelProyecto(i);
-                Log.d("TAG 3","has elegido el proyecto: "+adapterView.getItemAtPosition(i));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        //Inicialitzem l'arrayList de projectes
+        llistatProjectes = new ArrayList<Proyecto>(); //ArrayList amb TOTS els projectes disponibles
+        llistatNomsProjecte = new ArrayList<>(); //ArrayList només amb els noms dels projectes (per a l'spinner)
+        omplirSpinnerDeProjectes(); //Consulta firebase i ompli l'spinner amb els noms dels projectes.
 
         return v;
     }
 
-    private void mostrarUsuariosDelProyecto(int posicionProyecto){
-        Proyecto proyectoSeleccionadoPorUsuario = listadoProyectos.get(posicionProyecto);
-        ArrayList<String> listaIDUsuariosProyecto = proyectoSeleccionadoPorUsuario.getId_usu();
+    private void omplirSpinnerDeProjectes(){
+        //FIREBASE
+        Query consultaListaProjectes= FirebaseDatabase.getInstance().getReference().child("Proyectos").orderByChild("nombreProyecto");
 
+        //Consultem la llista de projectes
+        consultaListaProjectes.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot d: dataSnapshot.getChildren()){
+                    Proyecto unProjecte = d.getValue(Proyecto.class);
+                    ArrayList <String> llistaDusuarisDelProjecte = new ArrayList<String>();
+                    //obtenim el llistat d'usuaris del projecte.
+                    for(DataSnapshot unUsuari: d.child("usuarios").getChildren()){
+                        llistaDusuarisDelProjecte.add(unUsuari.getValue(String.class));
+                    }
+                    // Afegiml'arraylist d'usuaris del projecte a l'objecte Projecte
+                    unProjecte.setId_usu(llistaDusuarisDelProjecte);
+                    llistatProjectes.add(unProjecte);
+                    llistatNomsProjecte.add(unProjecte.getNombreProyecto());
+                }
 
-        for(String id_usu : listaIDUsuariosProyecto){
-            //FIREBASE
-            referenceProyecto = FirebaseDatabase.getInstance().getReference().child("Perfiles").child("id");
-            referenceProyecto.equalTo(id_usu);
-            //Consultamos la lista de proyectos
-            referenceProyecto.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot d: dataSnapshot.getChildren()){
-                        Perfil unPerfil = d.getValue(Perfil.class);
-                        Log.d("TAG 1","he leído:"+unPerfil.getNombre());
-                        listadoNombres_UsuariosProyecto.add(unPerfil.getNombre());
+                ArrayAdapter<String> adaptadorSpinner = new ArrayAdapter<>(getActivity().getApplicationContext(),android.R.layout.simple_spinner_item,llistatNomsProjecte);
+                adaptadorSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                //Omplim l'spinner amb el llistat de projectes
+                spinnerProyecto.setAdapter(adaptadorSpinner);
+                spinnerProyecto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        //Consultem en firebase pels usuaris del projecte seleccionat
+                        //mostraUsuarisProjecte(i);
+                        carregaTotsElsPerfilsDelProjecte(i);
+                        ompliRecyclerUsuaris(llistatPerfilsProjecte);
                     }
 
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+    }
+
+    private void ompliRecyclerUsuaris(ArrayList<Perfil> llistatPerfilsProjecte) {
+
+
+        listaUsuarios.setAdapter(new AdaptadorRecyclerUsuaris(llistatPerfilsProjecte));
+    }
+
+    private void carregaTotsElsPerfilsDelProjecte(int posicioProjecte) {
+        Proyecto proyectoSeleccionadoPorUsuario = llistatProjectes.get(posicioProjecte);
+        final ArrayList<String> identificadorsUsuarisProjecte;
+         llistatPerfils = new ArrayList<>();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Perfiles");
+        identificadorsUsuarisProjecte = proyectoSeleccionadoPorUsuario.getId_usu();
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    Perfil unPerfil = d.getValue(Perfil.class);
+                    //obtenim el llistat de TOTS perfils.
+                    llistaDeTotsElsPerfils.put(unPerfil.getId(), unPerfil);
+                    Log.d("MANEL","Components: "+unPerfil.getNombre()+"-"+unPerfil.getEmail());
+                }
+                //Obtenim un ArrayList amb només els perfils del projecte seleccionat
+                for(String idPerfil:identificadorsUsuarisProjecte){
+                    if(llistaDeTotsElsPerfils.containsKey(idPerfil)){
+                        Log.d("MANEL","Usuaris del projecte: "+llistaDeTotsElsPerfils.get(idPerfil).getNombre()+"-"+llistaDeTotsElsPerfils.get(idPerfil).getEmail());
+                        llistatPerfils.add(llistaDeTotsElsPerfils.get(idPerfil));
+                    }
                 }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    System.out.println("The read failed: " + databaseError.getCode());
-                }
-            });
-        }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+
+        });
     }
 
     private void animarFab(){
@@ -252,6 +287,7 @@ public class ProyectoFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof ComunicaProyectoConActivity) {
             mListener = (ComunicaProyectoConActivity) context;
+            consultaProjectes();
         } else {
             throw new RuntimeException(context.toString()
                     + " tienes que implementar la interfaz ComunicaProyectoConActivity");
@@ -278,4 +314,5 @@ public class ProyectoFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-}
+
+ }
