@@ -56,13 +56,13 @@ public class ProyectoFragment extends Fragment {
     private FragmentManager fm;
     private RecyclerView listaUsuarios, listaTareas;
     private RecyclerView.LayoutManager lm;
-    private ArrayList<Tarea> listadoTareasProyecto;
     private AdaptadorRecyclerUsuarios aru;
     private AdaptadorRecyclerTareas art;
 
 
     private ArrayList<Proyecto> listadoProyectos;
     private ArrayList<Perfil> listadoPerfilesProyecto;
+    private ArrayList<Tarea> listadoTareasProyecto;
     private HashMap<String,Perfil> listadoDePerfiles = new HashMap<>();
     private HashMap<String,Tarea> listadoDeTareas = new HashMap<>();
     private ArrayList<String> listadoNombresProyecto;
@@ -103,8 +103,6 @@ public class ProyectoFragment extends Fragment {
         listaTareas = v.findViewById(R.id.lista_tareas);
         registerForContextMenu(listaUsuarios);
         registerForContextMenu(listaTareas);
-
-        listadoTareasProyecto = new ArrayList<Tarea>();
 
         //BLOQUE DE FLOATING ACTION BUTTON
         añadir = v.findViewById(R.id.añadir);
@@ -159,6 +157,7 @@ public class ProyectoFragment extends Fragment {
         //Inicializamos el arrayList de proyectos
         listadoProyectos = new ArrayList<Proyecto>(); //ArrayList con TODOS los proyectos disponibles
         listadoNombresProyecto = new ArrayList<>(); //ArrayList solo con nombres de proyectos para el Spinner
+
         llenaSpinnerDeNombres(); //Consulta firebase y llena el spinner con nombres
 
         return v;
@@ -195,8 +194,8 @@ public class ProyectoFragment extends Fragment {
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         //Consultamos Firebase por los usuarios del proyecto seleccionado
                         //mostraUsuarisProjecte(i);
-                        cargarTareasDelProyecto(i);
                         cargarPerfilesDelProyecto(i);
+                        cargarTareasDelProyecto(i);
                         llenarRecyclerUsuarios();
                         llenarRecyclerTareas();
 
@@ -217,14 +216,6 @@ public class ProyectoFragment extends Fragment {
 
     }
 
-    private void llenarRecyclerTareas() {
-        // LayoutManager del RecyclerView Tareas
-        lm = new LinearLayoutManager(getActivity().getApplicationContext());
-        listaTareas.setLayoutManager(lm);
-        art = new AdaptadorRecyclerTareas(listadoTareasProyecto);
-        listaTareas.setAdapter(art);
-    }
-
     private void llenarRecyclerUsuarios() {
         // LayoutManager del RecyclerView Usuarios
         lm = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -232,6 +223,14 @@ public class ProyectoFragment extends Fragment {
         aru=new AdaptadorRecyclerUsuarios(listadoPerfilesProyecto);
         listaUsuarios.setAdapter(aru);
 
+    }
+
+    private void llenarRecyclerTareas() {
+        // LayoutManager del RecyclerView Tareas
+        lm = new LinearLayoutManager(getActivity().getApplicationContext());
+        listaTareas.setLayoutManager(lm);
+        art = new AdaptadorRecyclerTareas(listadoTareasProyecto);
+        listaTareas.setAdapter(art);
     }
 
     private void cargarPerfilesDelProyecto(int posProyecto) {
@@ -257,7 +256,6 @@ public class ProyectoFragment extends Fragment {
                     }
                 }
                 aru.notifyDataSetChanged();
-
             }
 
             @Override
@@ -279,8 +277,8 @@ public class ProyectoFragment extends Fragment {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    Tarea unaTarea = data.getValue(Tarea.class);
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    Tarea unaTarea = d.getValue(Tarea.class);
                     //Obtenemos el listado de TODAS las tareas
                     listadoDeTareas.put(unaTarea.getId(), unaTarea);
                 }
