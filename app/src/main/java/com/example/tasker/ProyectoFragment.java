@@ -174,12 +174,17 @@ public class ProyectoFragment extends Fragment {
                 for(DataSnapshot d: dataSnapshot.getChildren()){
                     Proyecto unProyecto = d.getValue(Proyecto.class);
                     ArrayList <String> listaUsuariosDelProyecto = new ArrayList<String>();
-                    //Obtenemos la lista
+                    ArrayList <String> listaTareasDelProyecto = new ArrayList<String>();
+                    //Obtenemos la lista de usuarios
                     for(DataSnapshot unUsuario: d.child("usuarios").getChildren()){
                         listaUsuariosDelProyecto.add(unUsuario.getValue(String.class));
                     }
+                    for(DataSnapshot unUsuario: d.child("lista_tareas").getChildren()){
+                        listaTareasDelProyecto.add(unUsuario.getValue(String.class));
+                    }
                     //Añadimos el arrayList de usuarios del proyecto al objeto Proyecto
                     unProyecto.setId_usu(listaUsuariosDelProyecto);
+                    unProyecto.setId_tareas(listaTareasDelProyecto);
                     listadoProyectos.add(unProyecto);
                     listadoNombresProyecto.add(unProyecto.getNombreProyecto());
                 }
@@ -268,11 +273,13 @@ public class ProyectoFragment extends Fragment {
 
     private void cargarTareasDelProyecto(int posProyecto){
         Proyecto proyectoSeleccionado = listadoProyectos.get(posProyecto);
-        final ArrayList<String> idTareasProyecto;
+        final ArrayList<String> idTareasProyecto; //Tareas del proyecto seleccionado
+
         listadoTareasProyecto = new ArrayList<>();
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Tareas");
         idTareasProyecto = proyectoSeleccionado.getId_tareas();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Tareas");
+
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
