@@ -32,14 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ComunicaProyectoConActivity} interface
- * to handle interaction events.
- * Use the {@link ProyectoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProyectoFragment extends Fragment {
 
     private Spinner spinnerProyecto;
@@ -51,7 +43,7 @@ public class ProyectoFragment extends Fragment {
     boolean isOpen = false;
 
     private Proyecto proyecto;
-    private Fragment fNuevoProyecto, fNuevaTarea;
+    private Fragment fNuevoProyecto, fNuevaTarea, fNuevoUsuario;
     private FragmentTransaction ft;
     private FragmentManager fm;
     private RecyclerView listaUsuarios, listaTareas;
@@ -131,13 +123,19 @@ public class ProyectoFragment extends Fragment {
                 ft = fm.beginTransaction();
                 ft.replace(R.id.fr_contenido_ppal, fNuevoProyecto);
                 ft.commit();
+                ft.addToBackStack("Fragment nuevo proyecto");
             }
         });
 
         añadirUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v, "Añadir usuario", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                fNuevoProyecto = new NuevoProyectoFragment().newInstance("","");
+                fm = getFragmentManager();
+                ft = fm.beginTransaction();
+                ft.replace(R.id.fr_contenido_ppal, fNuevoProyecto);
+                ft.commit();
+                ft.addToBackStack("Fragment nuevo usuario");
             }
         });
 
@@ -149,6 +147,7 @@ public class ProyectoFragment extends Fragment {
                 ft = fm.beginTransaction();
                 ft.replace(R.id.fr_contenido_ppal, fNuevaTarea);
                 ft.commit();
+                ft.addToBackStack("Fragment nueva tarea");
             }
         });
 

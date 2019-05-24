@@ -49,8 +49,6 @@ public class Main3Activity extends AppCompatActivity
 
     NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
     navigationView.setNavigationItemSelectedListener(this);
-
-    //reference = FirebaseDatabase.getInstance().getReference("reference");
   }
 
   @Override
@@ -72,16 +70,10 @@ public class Main3Activity extends AppCompatActivity
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
-
-    //noinspection SimplifiableIfStatement
     if (id == R.id.action_settings) {
       return true;
     }
-
     return super.onOptionsItemSelected(item);
   }
 
@@ -126,13 +118,6 @@ public class Main3Activity extends AppCompatActivity
     return true;
   }
 
-  @Override
-  public void datosGuardados() {//HACER QUE ENVÍE DATOS A LA BD
-    ft=fm.beginTransaction();
-    ft.remove(fperfil);
-    ft.commit();
-  }
-  //Interfaz UsuarioFragment
   @Override
   public void onFragmentInteraction(Uri uri) {
 
