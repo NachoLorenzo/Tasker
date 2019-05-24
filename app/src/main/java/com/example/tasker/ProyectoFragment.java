@@ -62,6 +62,7 @@ public class ProyectoFragment extends Fragment {
     private ArrayList<Tarea> arrayTareas;
     private ArrayAdapter<Usuario> adapterListaUsuarios;
     private ArrayAdapter<Tarea> adapterListaTareas;
+    private AdaptadorRecyclerUsuaris aru;
 
     private ArrayList<Proyecto> listadoProyectos;
     private ArrayList<String> listadoNombres_UsuariosProyecto;
@@ -114,9 +115,7 @@ public class ProyectoFragment extends Fragment {
 
 
         arrayTareas = new ArrayList<Tarea>();
-        // LayoutManager del RecyclerView Usuarios
-        lm = new LinearLayoutManager(getActivity().getApplicationContext());
-        listaUsuarios.setLayoutManager(lm);
+
 
         adapterListaTareas = new ArrayAdapter<Tarea>(getActivity(), android.R.layout.simple_list_item_1, arrayTareas);
 
@@ -199,7 +198,9 @@ public class ProyectoFragment extends Fragment {
                         //Consultem en firebase pels usuaris del projecte seleccionat
                         //mostraUsuarisProjecte(i);
                         carregaTotsElsPerfilsDelProjecte(i);
-                        ompliRecyclerUsuaris(llistatPerfilsProjecte);
+                        ompliRecyclerUsuaris();
+                        carregarTotesLesTasquesDelProjecte();
+                       // omplirRecyclerTasques();
                     }
 
                     @Override
@@ -217,16 +218,23 @@ public class ProyectoFragment extends Fragment {
 
     }
 
-    private void ompliRecyclerUsuaris(ArrayList<Perfil> llistatPerfilsProjecte) {
+    private void carregarTotesLesTasquesDelProjecte() {
 
+    }
 
-        listaUsuarios.setAdapter(new AdaptadorRecyclerUsuaris(llistatPerfilsProjecte));
+    private void ompliRecyclerUsuaris() {
+        // LayoutManager del RecyclerView Usuarios
+        lm = new LinearLayoutManager(getActivity().getApplicationContext());
+        listaUsuarios.setLayoutManager(lm);
+         aru=new AdaptadorRecyclerUsuaris(llistatPerfilsProjecte);
+        listaUsuarios.setAdapter(aru);
+
     }
 
     private void carregaTotsElsPerfilsDelProjecte(int posicioProjecte) {
         Proyecto proyectoSeleccionadoPorUsuario = llistatProjectes.get(posicioProjecte);
         final ArrayList<String> identificadorsUsuarisProjecte;
-         llistatPerfils = new ArrayList<>();
+         llistatPerfilsProjecte = new ArrayList<>();
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Perfiles");
         identificadorsUsuarisProjecte = proyectoSeleccionadoPorUsuario.getId_usu();
@@ -244,9 +252,11 @@ public class ProyectoFragment extends Fragment {
                 for(String idPerfil:identificadorsUsuarisProjecte){
                     if(llistaDeTotsElsPerfils.containsKey(idPerfil)){
                         Log.d("MANEL","Usuaris del projecte: "+llistaDeTotsElsPerfils.get(idPerfil).getNombre()+"-"+llistaDeTotsElsPerfils.get(idPerfil).getEmail());
-                        llistatPerfils.add(llistaDeTotsElsPerfils.get(idPerfil));
+                        llistatPerfilsProjecte.add(llistaDeTotsElsPerfils.get(idPerfil));
+
                     }
                 }
+                aru.notifyDataSetChanged();
 
             }
 
