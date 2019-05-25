@@ -99,12 +99,14 @@ public class PerfilFragment extends Fragment {
     }
 
     public void guardarPerfil(){
+        Proyecto proyectoRelacionado = new Proyecto();
         String nombre = edit_profile_name.getText().toString();
         String edad = edit_edad.getText().toString();
         String email = edit_email.getText().toString();
         String id = referencePerfil.push().getKey();
+        String id_proyecto = proyectoRelacionado.getId();
 
-        Usuario perfil = new Usuario(id, nombre, edad, email);
+        Usuario perfil = new Usuario(id, nombre, edad, email, id_proyecto);
         referencePerfil.child("Perfiles").child(id).setValue(perfil);
 
     }

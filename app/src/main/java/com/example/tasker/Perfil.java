@@ -6,16 +6,22 @@ public class Perfil {
     String email;
     String nombre;
     String edad;
+    String id_proyecto;
 
     public Perfil() {
     }
 
-    public Perfil(String id, String email, String nombre, String edad) {
+    public Perfil(String id, String email, String nombre, String edad, String id_proyecto) {
         this.id = id;
         this.email = email;
         this.nombre = nombre;
         this.edad = edad;
+        this.id_proyecto = id_proyecto;
     }
+
+    public String getId_proyecto() { return id_proyecto; }
+
+    public void setId_proyecto(String id_proyecto) { this.id_proyecto = id_proyecto; }
 
     public String getId() {
         return id;

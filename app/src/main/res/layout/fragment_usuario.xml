@@ -68,9 +68,23 @@
                 android:layout_height="wrap_content"
                 android:text="Documentos:"/>
             <ListView
+                android:id="@+id/zonaDocumentos"
                 android:layout_width="match_parent"
                 android:layout_height="140dp"
-                android:layout_margin="@dimen/activity_horizontal_margin"></ListView>
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:background="@color/cardview_shadow_start_color"></ListView>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/ic_download" />
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/ic_upload" />
 
         </LinearLayout>
 

@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/layoutUsuario">
 
     <TextView
-        android:id="@+id/nom"
+        android:id="@+id/nombreElementoUsuario"
         android:layout_width="411dp"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -18,7 +19,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/e-mail"
+        android:id="@+id/emailElementoUsuario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"

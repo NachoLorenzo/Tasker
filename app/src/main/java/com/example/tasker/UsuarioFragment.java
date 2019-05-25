@@ -1,15 +1,15 @@
 package com.example.tasker;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,21 +26,19 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
-import static android.support.constraint.Constraints.TAG;
+import static android.app.Activity.RESULT_OK;
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+import static android.os.Environment.DIRECTORY_PICTURES;
 
 
 /**
@@ -55,25 +52,27 @@ import static android.support.constraint.Constraints.TAG;
 public class UsuarioFragment extends Fragment {
 
 
-    private String nombre, edad, email, idUsuario;
+    private String nombre, edad, email, idUsuario, idProyecto;
     private ComunicaUsuarioConActivity mListener;
     private ImageView b_enviar;
     private EditText edit_comentario;
     private Spinner spinnerUsuario, spinnerTarea;
     private SpinnerAdapter adapterSpinnerUsuario;
-    private ListView lista_comentarios;
-    private ArrayList<String> list_comments;
-    private ArrayAdapter<String> list_adapter;
+    private ListView lista_comentarios, zonaDocumentos;
+    private ArrayList<String> list_comments, list_documents;
+    private ArrayAdapter<String> list_adapter, adapter_lista_documentos;
     private CalendarView calendar;
-    //private Long fechaCalendar = calendar.getDate();
-    //private DateFormat formatoFecha = new SimpleDateFormat("dd-mm-yyyy");
-    //private String fechaFinal = formatoFecha.format(fechaCalendar);
     private ArrayList<Usuario> lista_usuarios;
     private ArrayAdapter<Usuario> adapter_lista_usuarios;
+    private FloatingActionButton upload, download;
+    private static final int gallery_intent = 1;
 
     private Usuario objetoUsuario;
 
     private DatabaseReference referenceUsuario;
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef = storage.getReference();
+    private StorageReference reference; //REFERENCE PARA DESCARGAR ARCHIVOS
 
     public UsuarioFragment() {
         // Required empty public constructor
@@ -102,13 +101,23 @@ public class UsuarioFragment extends Fragment {
         calendar = v.findViewById(R.id.calendarUsuario);
         spinnerTarea = v.findViewById(R.id.spinnerTarea);
 
+        upload = v.findViewById(R.id.upload);
+        download = v.findViewById(R.id.download);
+        storageRef = FirebaseStorage.getInstance().getReference();
+        zonaDocumentos = v.findViewById(R.id.zonaDocumentos);
+        list_documents = new ArrayList<>();
+        adapter_lista_documentos = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, list_documents);
+        zonaDocumentos.setAdapter(adapter_lista_documentos);
+        registerForContextMenu(zonaDocumentos);
+
         lista_comentarios = v.findViewById(R.id.list_comentarios);
         registerForContextMenu(lista_comentarios);
-        list_comments = new ArrayList<String>();
-        list_adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, list_comments);
+        list_comments = new ArrayList<>();
+        list_adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, list_comments);
         lista_comentarios.setAdapter(list_adapter);
 
-        spinnerUsuario = (Spinner) v.findViewById(R.id.spinnerUsuario);
+
+        spinnerUsuario = v.findViewById(R.id.spinnerUsuario);
         adapterSpinnerUsuario = new SpinnerAdapter() {
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) { return null; }
@@ -133,7 +142,7 @@ public class UsuarioFragment extends Fragment {
             @Override
             public boolean isEmpty() { return false; }
             };
-        //spinnerUsuario.setAdapter(adapterSpinnerUsuario);
+
         lista_usuarios = new ArrayList<Usuario>();
         adapter_lista_usuarios = new ArrayAdapter<Usuario>(getActivity(), android.R.layout.simple_spinner_item, lista_usuarios);
         adapter_lista_usuarios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -154,38 +163,44 @@ public class UsuarioFragment extends Fragment {
             }
         });
 
-        /*spinnerUsuario.setOnClickListener(new View.OnClickListener() {
+        upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                referenceUsuario.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
+                subirDocumento();
             }
-        });*/
+        });
+
+        download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                descargar();
+            }
+        });
+
         return v;
     }
 
-    @Override//MENU AL MANTENER PULSADO. OPCIÓN DE BORRAR COMENTARIO
+    @Override//MENU AL MANTENER PULSADO. OPCIÓN DE BORRAR COMENTARIO Y DESCARGAR DOCUMENTO
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
-        if(v.getId()==R.id.list_comentarios){
+
+        if(v.getId() == R.id.zonaDocumentos){
+            MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.menu_download, menu);
+        }
+        if(v.getId() == R.id.list_comentarios) {
             MenuInflater inflater = getActivity().getMenuInflater();
             inflater.inflate(R.menu.menu_delete, menu);
         }
+
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item){
         AdapterView.AdapterContextMenuInfo adapterContextMenu = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()){
+            case R.id.action_download:
+                descargar();
             case R.id.action_delete:
                     list_comments.remove(list_adapter.getItem(adapterContextMenu.position));
                     list_adapter.notifyDataSetChanged();
@@ -216,10 +231,69 @@ public class UsuarioFragment extends Fragment {
         edad = objetoUsuario.getEdad();
         email = objetoUsuario.getEmail();
         idUsuario = referenceUsuario.push().getKey();
-        //String fecha = fechaFinal.toString();
-        //String tarea = spinnerTarea.getSelectedItem().toString();
-        Usuario usuario = new Usuario(nombre, edad, email, idUsuario);
+        idProyecto = objetoUsuario.getId_proyecto();
+
+        Usuario usuario = new Usuario(nombre, edad, email, idUsuario, idProyecto);
         referenceUsuario.child("Usuario").child(idUsuario).setValue(usuario);
+    }
+
+    private void subirDocumento() {
+
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("*/*");
+        startActivityForResult(intent, gallery_intent);
+
+    }
+
+    private void descargar(){
+
+        reference = storageRef.child("Documentos").child("image:6225");
+        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                String url = uri.toString();
+                descargaArchivo(getActivity().getApplicationContext(), "image:6225", ".jpeg", DIRECTORY_DOWNLOADS, url);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+    private void descargaArchivo(Context context, String nombreArchivo, String extension, String directorioDestino, String url){
+
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalFilesDir(context, directorioDestino, nombreArchivo + extension);
+
+        downloadManager.enqueue(request);
+
+
+    }
+
+    //ALMACENAMOS LOS DOCUMENTOS SUBIDOS A LA APP
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == gallery_intent && resultCode == RESULT_OK){
+
+            Uri uri = data.getData();
+            //Creamos la carpeta Documentos y metemos el documento que está en el URI y le asigna un valor
+            StorageReference path = storageRef.child("Documentos").child(uri.getLastPathSegment());
+            path.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Archivo subido", Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        }
     }
 
     public interface ComunicaUsuarioConActivity {

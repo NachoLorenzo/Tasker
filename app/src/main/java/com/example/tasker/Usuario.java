@@ -2,15 +2,14 @@ package com.example.tasker;
 
 public class Usuario {
 
-    String id, nombre, edad, email, fecha, tarea;
+    String id, nombre, edad, email, id_proyecto;
 
-    public Usuario(String id, String nombre, String edad, String email/*, String fecha, String tarea*/) {
+    public Usuario(String id, String nombre, String edad, String email, String id_proyecto){
         this.id = id;
         this.nombre = nombre;
         this.edad = edad;
         this.email = email;
-        //this.fecha = fecha;
-        //this.tarea = tarea;
+        this.id_proyecto = id_proyecto;
     }
 
 
@@ -18,8 +17,10 @@ public class Usuario {
     public String getNombre() { return nombre; }
     public String getEdad() { return edad; }
     public String getEmail() { return email; }
-    //public String getFecha() { return fecha; }
-    //public String getTarea() { return tarea; }
+    public String getId_proyecto() { return id_proyecto; }
+
+
+
 
     public void setId(String id) { this.id = id; }
     public void setNombre(String nombre) {
@@ -31,6 +32,5 @@ public class Usuario {
     public void setEmail(String email) {
         this.email = email;
     }
-    //public void setFecha(String fecha) { this.fecha = fecha; }
-    //public void setTarea(String tarea) { this.tarea = tarea; }
+    public void setId_proyecto(String id_proyecto) { this.id_proyecto = id_proyecto; }
 }

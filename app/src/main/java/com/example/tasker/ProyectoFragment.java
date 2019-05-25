@@ -27,6 +27,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,10 +132,10 @@ public class ProyectoFragment extends Fragment {
         añadirUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fNuevoProyecto = new NuevoProyectoFragment().newInstance("","");
+                fNuevoUsuario = new PerfilFragment().newInstance("","");
                 fm = getFragmentManager();
                 ft = fm.beginTransaction();
-                ft.replace(R.id.fr_contenido_ppal, fNuevoProyecto);
+                ft.replace(R.id.fr_contenido_ppal, fNuevoUsuario);
                 ft.commit();
                 ft.addToBackStack("Fragment nuevo usuario");
             }
