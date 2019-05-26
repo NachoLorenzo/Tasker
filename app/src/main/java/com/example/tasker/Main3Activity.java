@@ -105,12 +105,6 @@ public class Main3Activity extends AppCompatActivity
       ft2 = fm2.beginTransaction();
       ft2.replace(R.id.fr_contenido_ppal, fusuario);
       ft2.commit();
-    } else if (id == R.id.nav_manage) {
-
-    } else if (id == R.id.nav_share) {
-
-    } else if (id == R.id.nav_send) {
-
     }
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
